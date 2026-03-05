@@ -983,6 +983,9 @@ function ScreenWelcome({ onStart, onBHW }) {
           <p style={{fontSize:16, color:"rgba(255,255,255,0.65)", lineHeight:1.6, marginBottom:32, maxWidth:320}}>
             Ang tamang pagkain para sa iyong katawan — sa Filipino, para sa mga Pilipino.
           </p>
+        <p style={{fontSize:4, color:"rgba(255,255,255,0.65)", lineHeight:1.6, marginBottom:32, maxWidth:320}}>
+            Prototype: JKOB
+          </p>
         </div>
 
         {/* Feature list */}
@@ -1048,6 +1051,7 @@ function ScreenWelcome({ onStart, onBHW }) {
         <p style={{fontSize:10, color:"rgba(255,255,255,0.3)", lineHeight:1.6}}>
           Para sa kaalaman lamang. Hindi kapalit ng medikal na payo. Kumonsulta sa iyong doktor.
         </p>
+        
       </div>
     </div>
   );
