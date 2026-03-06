@@ -1137,10 +1137,53 @@ const FOOD_DATABASE = [
 // ============================================
 function findFoodInDB(query) {
   const q = query.toLowerCase().trim();
-  return FOOD_DATABASE.find(f =>
-    f.aliases.some(a => q.includes(a) || a.includes(q)) ||
-    f.name.toLowerCase().includes(q) || q.includes(f.name.toLowerCase())
-  ) || null;
+  const words = q.split(/\s+/);
+
+  function wholeWordMatch(haystack, needle) {
+    const hw = haystack.toLowerCase();
+    const nw = needle.toLowerCase().trim();
+    if (hw === nw) return true;
+    return nw.split(/\s+/).every(w =>
+      new RegExp(`(?:^|\\s|-)${w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')}(?:\\s|-|$)`).test(hw)
+    );
+  }
+
+  // 1. Exact alias or name match
+  let result = FOOD_DATABASE.find(f =>
+    f.aliases.some(a => a.toLowerCase() === q) ||
+    f.name.toLowerCase() === q
+  );
+  if (result) return result;
+
+  // 2. Query contains a full alias as whole word (alias must be 4+ chars)
+  result = FOOD_DATABASE.find(f =>
+    f.aliases.some(a => {
+      const al = a.toLowerCase();
+      return al.length >= 4 && wholeWordMatch(q, al);
+    }) ||
+    (f.name.toLowerCase().length >= 4 && wholeWordMatch(q, f.name.toLowerCase()))
+  );
+  if (result) return result;
+
+  // 3. Alias contains full query as whole words (query must be 4+ chars)
+  if (q.length >= 4) {
+    result = FOOD_DATABASE.find(f =>
+      f.aliases.some(a => wholeWordMatch(a, q)) ||
+      wholeWordMatch(f.name, q)
+    );
+    if (result) return result;
+  }
+
+  // 4. Short exact fallback (3-char minimum, no substring)
+  if (q.length >= 3) {
+    result = FOOD_DATABASE.find(f =>
+      f.aliases.some(a => a.toLowerCase() === q) ||
+      f.name.toLowerCase() === q
+    );
+    if (result) return result;
+  }
+
+  return null;
 }
 
 function getCombinedVerdict(food, conditions) {
